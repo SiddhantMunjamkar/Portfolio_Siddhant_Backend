@@ -47,6 +47,7 @@ export async function processEmail(params: { info: EmailType; ip: string }) {
       throw new Error("Rate limit exceeded for sender");
     }
 
+    
     await transporter.sendMail({
       from: process.env.SMTP_USER,
       to: process.env.SMTP_USER,
