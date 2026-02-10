@@ -3,13 +3,14 @@ import {
   idempotency,
   releaseIdempotency,
 } from "../services/idempotency/idempotency.service";
-import { createTransporter } from "../services/mailer/mailer.service";
+// import { createTransporter } from "../services/mailer/mailer.service";
 import { generateEmailHTML } from "../services/mailer/bodyhtml";
+import { resend } from "../services/mailer/mailer.service";
 import { Ratelimitkeys } from "../services/rateLimit/rate.Limit.keys";
 import { rateLimit } from "../services/rateLimit/rate.Limit.service";
 
 export async function processEmail(params: { info: EmailType; ip: string }) {
-  const transporter = createTransporter();
+  // const transporter = createTransporter();
 
   const lock = await idempotency({
     email: params.info.email,
@@ -47,10 +48,9 @@ export async function processEmail(params: { info: EmailType; ip: string }) {
       throw new Error("Rate limit exceeded for sender");
     }
 
-    
-    await transporter.sendMail({
-      from: process.env.SMTP_USER,
-      to: process.env.SMTP_USER,
+    await resend.emails.send({
+      from: "onboarding@resend.dev",
+      to: process.env.SMTP_USER ?? "",
       subject: `Portfolio Contact: ${params.info.name}`,
       html: generateEmailHTML(params.info),
     });
